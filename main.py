@@ -8,11 +8,11 @@ CORS(app)
 
 # Azure OpenAI Settings
 openai.api_type = "azure"
-openai.api_base = "YOUR_AZURE_ENDPOINT"  # e.g., "https://your-resource.openai.azure.com/"
-openai.api_version = "2023-05-15"
-openai.api_key = "YOUR_API_KEY"
+openai.api_base = "https://educationhackathon.openai.azure.com/"
+openai.api_version = "2024-08-01-preview"
+openai.api_key = API_KEY
 
-DEPLOYMENT_NAME = "YOUR_DEPLOYMENT_NAME"  # Your GPT-3.5 or GPT-4 deployment name
+DEPLOYMENT_NAME = "gpt-4o"  # Your GPT-3.5 or GPT-4 deployment name
 
 class AINLPHelper:
     def summarize_text(self, text):
@@ -47,7 +47,7 @@ class AINLPHelper:
 
     def generate_questions(self, context):
         try:
-            prompt = f"Generate 3 interesting questions based on this text:\n\n{context}"
+            prompt = f"Generate 3 questions based on this text to test understanding:\n\n{context}"
             response = openai.ChatCompletion.create(
                 engine=DEPLOYMENT_NAME,
                 messages=[
