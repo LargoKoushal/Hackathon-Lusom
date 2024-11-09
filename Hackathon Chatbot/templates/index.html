@@ -86,6 +86,7 @@
             });
             const data = await response.json();
             
+            document.getElementById('stepSection').classList.remove('hidden');
             document.getElementById('questionSection').classList.remove('hidden');
             document.getElementById('mainQuestion').textContent = data.question;
             document.getElementById('stepInstruction').textContent = data.step;

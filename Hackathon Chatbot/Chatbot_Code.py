@@ -3,12 +3,13 @@ import random
 import json
 import math
 
+current_step = 0
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Required for session management
 
 # Sample math topics and questions database
 MATH_DATABASE = {
-    "quadratic_equations": {
+    "quadratic equations": {
         "questions": [
             {
                 "question": "Solve the quadratic equation: x² + 5x + 6 = 0",
@@ -33,7 +34,7 @@ MATH_DATABASE = {
             }
         ]
     },
-    "pythagoras_theorem": {
+    "pythagoras theorem": {
         "questions": [
             {
                 "question": "Find the hypotenuse of a right-angled triangle with sides 3cm and 4cm",
@@ -41,12 +42,12 @@ MATH_DATABASE = {
                     {
                         "instruction": "Recall Pythagoras' theorem: a² + b² = c²",
                         "sub_question": "What do we substitute for a and b?",
-                        "answer": "3² + 4² = c²"
+                        "answer": "a = 3, b = 4"
                     },
                     {
                         "instruction": "Now calculate a² + b²",
                         "sub_question": "What is 3² + 4²?",
-                        "answer": "9 + 16 = 25"
+                        "answer": "25"
                     },
                     {
                         "instruction": "To find c, take the square root of both sides",
