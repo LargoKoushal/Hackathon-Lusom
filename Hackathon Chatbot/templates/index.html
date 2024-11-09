@@ -1,0 +1,146 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tutor</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Math Tutor</h1>
+        
+        <!-- Search Section -->
+        <div class="max-w-md mx-auto mb-8">
+            <input type="text" id="searchInput" 
+                   class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="Enter a math topic (e.g., quadratic_equations, pythagoras_theorem)">
+            <button onclick="searchTopic()" 
+                    class="w-full mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Search Topic
+            </button>
+        </div>
+
+        <!-- Question Section -->
+        <div id="questionSection" class="hidden max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+            <div id="mainQuestion" class="text-xl font-semibold mb-4"></div>
+            
+            <div id="stepSection" class="mb-4">
+                <div id="stepInstruction" class="text-gray-700 mb-2"></div>
+                <div id="subQuestion" class="font-medium mb-2"></div>
+                <input type="text" id="answerInput" 
+                       class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Your answer">
+                <button onclick="checkAnswer()" 
+                        class="w-full mt-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                    Submit Answer
+                </button>
+            </div>
+
+            <div id="feedback" class="hidden mb-4 p-4 rounded-lg"></div>
+            
+            <button onclick="getNewQuestion()" 
+                    class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                New Question
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentTopic = '';
+
+        async function searchTopic() {
+            const topic = document.getElementById('searchInput').value;
+            const response = await fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ topic }),
+            });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                currentTopic = data.topic;
+                getNewQuestion();
+            } else {
+                alert('Topic not found. Please try another topic.');
+            }
+        }
+
+        async function getNewQuestion() {
+            if (!currentTopic) return;
+            
+            const response = await fetch('/get_question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ topic: currentTopic }),
+            });
+            const data = await response.json();
+            
+            document.getElementById('questionSection').classList.remove('hidden');
+            document.getElementById('mainQuestion').textContent = data.question;
+            document.getElementById('stepInstruction').textContent = data.step;
+            document.getElementById('subQuestion').textContent = data.sub_question;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('feedback').classList.add('hidden');
+        }
+
+        async function checkAnswer() {
+            const answer = document.getElementById('answerInput').value;
+            const response = await fetch('/check_answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ answer }),
+            });
+            const data = await response.json();
+            
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden');
+            
+            if (data.is_correct) {
+                feedback.classList.remove('bg-red-100', 'text-red-700');
+                feedback.classList.add('bg-green-100', 'text-green-700');
+                feedback.textContent = 'Correct! ';
+                
+                if (data.next_step) {
+                    document.getElementById('stepInstruction').textContent = data.next_step.instruction;
+                    document.getElementById('subQuestion').textContent = data.next_step.sub_question;
+                    document.getElementById('answerInput').value = '';
+                } else {
+                    feedback.textContent += `Final answer: ${data.final_answer}`;
+                    document.getElementById('stepSection').classList.add('hidden');
+                }
+            } else {
+                feedback.classList.remove('bg-green-100', 'text-green-700');
+                feedback.classList.add('bg-red-100', 'text-red-700');
+                feedback.textContent = `Incorrect. Try again! The correct answer was: ${data.correct_answer}`;
+            }
+        }
+
+        // Allow Enter key to submit answers
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Allow Enter key to search topics
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTopic();
+            }
+        });
+    </script>
+</body>
+</html>
