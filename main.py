@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -10,7 +13,7 @@ CORS(app)
 openai.api_type = "azure"
 openai.api_base = "https://educationhackathon.openai.azure.com/"
 openai.api_version = "2024-08-01-preview"
-openai.api_key = API_KEY
+openai.api_key = "API_KEY"
 
 DEPLOYMENT_NAME = "gpt-4o"  # Your GPT-3.5 or GPT-4 deployment name
 
@@ -51,7 +54,7 @@ class AINLPHelper:
             response = openai.ChatCompletion.create(
                 engine=DEPLOYMENT_NAME,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that generates relevant questions based on given text."},
+                    {"role": "system", "content": "You are a helpful assistant that generates relevant and difficult questions based on given text that are made to test understanding."},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=150
